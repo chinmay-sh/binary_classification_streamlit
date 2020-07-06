@@ -73,22 +73,48 @@ def main():
             st.write('Recall: ', recall_score(y_test,y_pred,labels=class_names).round(2))
             plot_metrics(metrics)
 
+    if classifier == 'Logistic Regression':
+        st.sidebar.subheader('Model Hyperparameters')
+        C = st.sidebar.number_input('C (Regularization Parameter)',0.01,10.0, step=0.01, key='C_LR')
+        max_iter = st.sidebar.slider("Maximum number of iterations",100,500,key='max_iter')
 
+        metrics = st.sidebar.multiselect('Choose Metrics to plot',('Confusion Matrix', 'ROC Curve','Precision-Recall Curve'))
 
+        if st.sidebar.button('Classify', key='classify'):
+            st.subheader('Logistic Regression Results')
+            model = LogisticRegression(C=C, max_iter=max_iter)
+            model.fit(x_train,y_train)
+            accuracy = model.score(x_test, y_test)
+            y_pred = model.predict(x_test)
+            st.write('Accuracy: ', accuracy.round(2))
+            st.write('Precision: ', precision_score(y_test,y_pred,labels=class_names).round(2))
+            st.write('Recall: ', recall_score(y_test,y_pred,labels=class_names).round(2))
+            plot_metrics(metrics)
 
+    if classifier == 'Random Forest':
+        st.sidebar.subheader('Model Hyperparameters')
+        n_estimators = st.sidebar.number_input('Number of trees in the forest',100,5000,step=10,key='n_estimators')
+        max_depth = st.sidebar.number_input('Maximum depth of the tree',1,20,step=1,key='max_depth')
+        bootstrap = st.sidebar.radio('Bootstrap samples when building trees',("True","False"),key='bootstrap')
 
+        metrics = st.sidebar.multiselect('Choose Metrics to plot',('Confusion Matrix', 'ROC Curve','Precision-Recall Curve'))
 
+        if st.sidebar.button('Classify', key='classify'):
+            st.subheader('Random Forest Results')
+            model = RandomForestClassifier(n_estimators=n_estimators,max_depth=max_depth,bootstrap=bootstrap,n_jobs=-1)
+            model.fit(x_train,y_train)
+            accuracy = model.score(x_test, y_test)
+            y_pred = model.predict(x_test)
+            st.write('Accuracy: ', accuracy.round(2))
+            st.write('Precision: ', precision_score(y_test,y_pred,labels=class_names).round(2))
+            st.write('Recall: ', recall_score(y_test,y_pred,labels=class_names).round(2))
+            plot_metrics(metrics)
 
 
 
     if st.sidebar.checkbox('Show raw data', False):
         st.subheader('Mushrooms Data set (Clasification)')
         st.write(df)
-
-
-
-
-
 
 
 if __name__ == '__main__':
